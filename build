@@ -1,0 +1,24 @@
+#! /bin/sh
+
+export BUILDDIR=/tmp
+export PREFIX=/tmp/prefix/
+export CONDADIR=/tmp/condaenv
+export PATH=$PREFIX/bin:$PATH
+export LD_LIBRARY_PATH=$PREFIX/lib:$PREFIX/lib64
+# Install python3
+curl https://www.python.org/ftp/python/3.9.0/Python-3.9.0.tar.xz | tar xJ
+cd Python-*
+./configure --prefix=$PREFIX
+make -j($nproc) install
+cd $PREFIX/bin
+ln -s python3 python
+
+# Install conda
+cd $BUILDDIR
+curl -L https://github.com/conda/conda/archive/4.9.2.tar.gz | tar xz
+cd conda-*
+python3 setup.py install
+
+# Use conda to create a conda forge environment
+. "$PREFIX/etc/profile.d/conda.sh"
+conda create -d $CONDADIR -n python
